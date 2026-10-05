@@ -21,7 +21,7 @@ class GasService:
         page: int = 1,
         size: int = 20,
     ) -> tuple[list[dict[str, Any]], int]:
-        rows = store.rows(MODULE)
+        rows = store.visible_rows(MODULE)
         if keyword:
             rows = [row for row in rows if keyword in str(row.get("测点编号", ""))]
         if status:
@@ -43,6 +43,7 @@ class GasService:
         entry["status"] = STATUS_ORDER[0]
         entry["pending"] = True
         entry["abnormal"] = False
+        entry["unit"] = store.resolve_create_unit(values)
         rows.append(entry)
         return entry, []
 

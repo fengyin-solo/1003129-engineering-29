@@ -17,6 +17,8 @@ class Settings:
     )
     page_size_default: int = 20
     page_size_max: int = 200
+    # 启动时的汇总口径版本，运行中可通过 /api/overview/caliber 调整。
+    summary_caliber_version: str = "v2"
 
 
 settings = Settings()
