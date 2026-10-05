@@ -86,8 +86,22 @@ function resetFilters() {
   void reload()
 }
 
-function exportRows() {
-  window.open(`${ENDPOINT}/export`, '_blank')
+async function exportRows() {
+  errorMessage.value = ''
+  try {
+    const response = await request(`${ENDPOINT}/export`)
+    if (!response.ok) {
+      throw new Error('清单导出失败，请稍后重试')
+    }
+    const blob = await response.blob()
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `${ENDPOINT.split('/').pop()}-清单.json`
+    link.click()
+    URL.revokeObjectURL(link.href)
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : '清单导出失败'
+  }
 }
 
 function openCreate() {

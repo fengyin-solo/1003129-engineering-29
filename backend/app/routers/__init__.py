@@ -7,6 +7,8 @@
 from __future__ import annotations
 
 from app.routers import minearea as router_minearea
+from app.routers import overview as router_overview
+from app.routers import audit as router_audit
 from app.routers import gas as router_gas
 from app.routers import ventilation as router_ventilation
 from app.routers import roof as router_roof
@@ -27,4 +29,4 @@ from app.routers import monitorstation as router_monitorstation
 from app.routers import certificate as router_certificate
 from app.routers import emergencydrill as router_emergencydrill
 
-ROUTERS = [router_minearea, router_gas, router_ventilation, router_roof, router_waterhazard, router_rockburst, router_personnel, router_dust, router_fireprevent, router_belt, router_hoist, router_power, router_rescue, router_training, router_shift, router_explosive, router_roadway, router_monitorstation, router_certificate, router_emergencydrill]
+ROUTERS = [router_overview, router_audit, router_minearea, router_gas, router_ventilation, router_roof, router_waterhazard, router_rockburst, router_personnel, router_dust, router_fireprevent, router_belt, router_hoist, router_power, router_rescue, router_training, router_shift, router_explosive, router_roadway, router_monitorstation, router_certificate, router_emergencydrill]

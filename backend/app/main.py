@@ -8,6 +8,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.access_control import AccessControlMiddleware
 from app.config import settings
 from app.routers import ROUTERS
 from app.store import store
@@ -21,6 +22,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# 越权拦截要在业务路由之前生效：跨单位访问与改动在这里统一拒绝并记录。
+app.add_middleware(AccessControlMiddleware)
 
 for module in ROUTERS:
     app.include_router(module.router)
@@ -30,9 +33,3 @@ for module in ROUTERS:
 def health() -> dict[str, object]:
     """健康检查：确认服务已经监听、示例数据已经就绪。"""
     return {"ok": True, "app": settings.app_name, "modules": len(store.module_names())}
-
-
-@app.get("/api/overview")
-def overview() -> dict[str, object]:
-    """运营概览：把各业务模块的待处理量汇总成看板卡片。"""
-    return store.overview()

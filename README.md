@@ -76,3 +76,30 @@ npm run dev
   `backend/app/routers/<模块>.py`，业务规则在 `backend/app/services/<模块>.py`。
 - 列表接口统一返回 `{ items, total, page, size }`，动作接口统一返回 `{ ok, message }`。
 - 状态流转只允许在 `app/services` 里改，路由层不做业务判断。
+
+## 身份与可见范围
+
+平台没有独立登录体系，调用方身份由请求头携带（前端会话自动附带，见
+`frontend/src/api/client.ts`）：
+
+| 请求头 | 含义 | 取值 |
+| --- | --- | --- |
+| `X-Operator-Id` | 操作人姓名 | 中文需 percent-encode |
+| `X-Role` | 角色 | `admin`（矿级）/ `team_lead`（班组长）/ `contractor`（外委单位） |
+| `X-Unit-Id` | 归属单位 | `mine-1`（一采区）/ `mine-2`（二采区）/ `contractor-1`（外委一队） |
+
+- 矿级可见全矿；班组长、外委单位只能看到并改动本单位名下的数据。
+- 列表、导出、明细、动作、运营概览共用同一份可见范围判定
+  （`app/security.py` + `app/store.visible_rows`），概览与列表同数一致。
+- 越权读取明细、跨单位改动（含跨单位登记）一律 403 拒绝，并记入操作日志
+  （`GET /api/audit/logs`，仅矿级可查；非矿级查询本身也会被记录）。
+- 运营概览里本单位没有的模块只显示有无、不显示条数；未携带身份头时按
+  矿级默认身份处理，保持原有行为。
+
+## 概览口径与快照
+
+- 汇总口径按版本管理（`app/services/overview.py` 的 `CRITERIA`）：`v1` 为旧口径
+  （全量统计、不看归属），`v2` 为现行口径（只统计可见范围，与列表同口径）。
+  口径调整时新增版本函数并切换 `CURRENT_CRITERIA`，概览实时按新口径重算。
+- `POST /api/overview/snapshots` 把当前概览按保存时的可见范围与口径落库；
+  `GET /api/overview/snapshots` 按单位隔离查看。已落库的旧快照不回头改写。

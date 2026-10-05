@@ -21,7 +21,7 @@ class TrainingService:
         page: int = 1,
         size: int = 20,
     ) -> tuple[list[dict[str, Any]], int]:
-        rows = store.rows(MODULE)
+        rows = store.visible_rows(MODULE)
         if keyword:
             rows = [row for row in rows if keyword in str(row.get("培训编号", ""))]
         if status:
